@@ -1,10 +1,9 @@
 let allProducts = [];
 
 async function fetchData() {
-    let response = await fetch('https://rickandmortyapi.com/api/character')
+    let response = await fetch('https://raw.githubusercontent.com/icalvo0130/DISNEYpage/refs/heads/main/DISNEYpage/src/data/data.json')
     let json = await response.json()
-    let data = json["results"]
-    parseDataToProducts(data)
+    parseDataToProducts(json)
 }
 
 //pasa de array data a Product 
@@ -50,10 +49,45 @@ document.getElementById("search").addEventListener("input", function(event) {
     }
 })
 
+const register_users = JSON.parse(localStorage.getItem("users")) || [];
+const login_user = JSON.parse(localStorage.getItem("login")) || null;
+
+function toFavorites(index) {
+    let product = allProducts[index];
+
+    const userIndex = register_users.findIndex(user => user.email === login_user.email);
+
+    let user = register_users[userIndex];
+
+    if (user.favorites.length !== 0) {
+        let exist = user.favorites.find(favorite => favorite.name === product.name);
+        if (exist) {
+            alert("Producto ya agregado a favoritos");
+            return
+        }   
+    }
+
+    user.favorites.push(product)
+
+    register_users[userIndex] = user;
+
+    localStorage.setItem("users", JSON.stringify(register_users));
+
+    alert("Producto añadido a favoritos correctamente")
+}
+
 //para llegar a la pag de detalle de product
 function productSelected(pos) {
     let productselected = allProducts[pos];    
-    window.location = "./producto1.html?name=" + encodeURIComponent(productselected.name);
+    window.location = "../product/producto1.html?name=" + encodeURIComponent(productselected.name);
 }
 
+function isLogged() {
+    if (login_user === null) {
+        alert("Debes iniciar sesión antes de ingresar")
+        window.location.href = "../login/login.html"
+    }
+}
+
+isLogged();
 fetchData();

@@ -2,10 +2,9 @@ const params = new URLSearchParams(window.location.search);
 const nameFromUrl = params.get('name');
 
 async function fetchData() {
-    let response = await fetch('https://rickandmortyapi.com/api/character')
+    let response = await fetch('https://raw.githubusercontent.com/icalvo0130/DISNEYpage/refs/heads/main/DISNEYpage/src/data/data.json')
     let json = await response.json()
-    let data = json["results"]
-    return getProduct(data)
+    return getProduct(json)
 }
 
 function getProduct(data) {
@@ -89,5 +88,41 @@ function setupQuantityButtons() {
     }
 }
 
+const register_users = JSON.parse(localStorage.getItem("users")) || [];
+const login_user = JSON.parse(localStorage.getItem("login")) || null;
 
-document.addEventListener('DOMContentLoaded', renderProduct);
+document.getElementById("fav").addEventListener("click", async function(event) {
+    event.preventDefault()
+
+    let product = await fetchData()
+
+    const userIndex = register_users.findIndex(user => user.email === login_user.email);
+
+    let user = register_users[userIndex];
+
+    if (user.favorites.length !== 0) {
+        let exist = user.favorites.find(favorite => favorite.name === product.name);
+        if (exist) {
+            alert("Producto ya agregado a favoritos");
+            return
+        }   
+    }
+
+    user.favorites.push(product)
+
+    register_users[userIndex] = user;
+
+    localStorage.setItem("users", JSON.stringify(register_users));
+
+    alert("Producto añadido a favoritos correctamente")
+})
+
+function isLogged() {
+    if (login_user === null) {
+        alert("Debes iniciar sesión antes de ingresar")
+        window.location.href = "../login/login.html"
+    }
+}
+
+isLogged();
+renderProduct();

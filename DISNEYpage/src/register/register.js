@@ -41,7 +41,8 @@ document.getElementById("register-form").addEventListener("submit", function(eve
     const user = {
         fullname: fullname,
         email: email,
-        password: password
+        password: password,
+        favorites: [],
     }
 
     register_users.push(user)
